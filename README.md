@@ -1,11 +1,11 @@
 
-# cncnet-docker-net8-tunnel
+# CnCNET Docker Tunnel Server based on Dot Net Core
 
-A repo that contains a dockerfile to create a cncnet tunnel server in docker using the DOT NET 8 Core technology.
+A repo that contains a dockerfile to create a cncnet tunnel server in docker using the DOT NET 8 or DOT NET 9 Core technology.
 
 1
 
-Clone the dockerfile from this repo to your server.
+Clone the dockerfile you want (net 8 or net 9) from this repo to your server.
 You will need to edit your server name here too
 
 2
