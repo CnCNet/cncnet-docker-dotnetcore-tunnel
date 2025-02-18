@@ -17,7 +17,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Set the version and base URL
-ARG VERSION=v4.0.24
+ARG VERSION=v4.0.25
 ARG BASE_URL=https://github.com/Rans4ckeR/cncnet-server/releases/download/${VERSION}/
 
 # Detect the architecture
