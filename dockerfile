@@ -1,3 +1,6 @@
+## Warning, this file will no longer get updates due to Rans4ckeR not supporting it. For more up to date verisons please use the dotnet9 version: https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/blob/main/dockerfile-dotnet9
+
+
 # Start with the Ubuntu base image
 FROM ubuntu:latest
 
