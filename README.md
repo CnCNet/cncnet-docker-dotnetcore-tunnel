@@ -1,16 +1,16 @@
+# CnCNET Docker Tunnel Server based on .NET Core
 
-# CnCNET Docker Tunnel Server based on Dot Net Core
+This repository contains Dockerfiles to create a CnCNet tunnel server in Docker using .NET 8 or .NET 9 Core technology.
 
-A repo that contains a dockerfile to create a cncnet tunnel server in docker using the DOT NET 8 or DOT NET 9 Core technology.
+---
 
-1
+## Getting Started
 
-Clone the dockerfile you want (net 8 or net 9) from this repo to your server.
-You will need to edit your server name here too
+### 1. Clone the Dockerfile you want (net8 or net9) from this repo to your server.
 
-2
+### 2. Build the Docker image
 
-Build the docker container from the docker file as below (feel free to update my-tunnel-server to a different name for ease of identifying in docker commands):
+Replace `my-tunnel-server` with a name that helps you identify your container:
 
 ```sh
 docker build -t my-tunnel-server .
@@ -31,6 +31,9 @@ docker run -d --name my-tunnel-server \
     --cap-add=NET_RAW --cap-add=NET_ADMIN \
     --restart unless-stopped \
     -v /path/to/host/logs:/logs \
+    -e SERVER_NAME="My Custom Tunnel Name" \
+    -e PORT1=50001 \
+    -e PORT2=50000 \
     my-tunnel-server
 ```
 
@@ -72,3 +75,37 @@ So your dockerfile run command may end up looking like
 CMD ./cncnet-server --name "CnCNet UK | cncnet.org" --2 --3 --m 200 --p 50001 --p2 50000 --masp "masterpassword" > cncnet-server.log 2>&1 && tail -f
 ```
 For example to change the servername and the official password needed to recognise your server as an official tunnel
+
+
+# Using Docker Compose
+For easier management, a docker-compose.yml is now included, you can simply update the SERVER_NAME variable and run docker compose up -d to get going. 
+
+```yml
+services:
+  cncnet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cncnet-server
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: "MyTunnel"
+      PORT1: 50001
+      PORT2: 50000
+    ports:
+      - "50000:50000/tcp"
+      - "50000:50000/udp"
+      - "50001:50001/tcp"
+      - "50001:50001/udp"
+      - "8054:8054/udp"
+      - "3478:3478/udp"
+    volumes:
+      - cncnet-logs:/logs
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+
+volumes:
+  cncnet-logs:
+
+```
