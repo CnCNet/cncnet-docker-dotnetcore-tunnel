@@ -1,0 +1,23 @@
+services:
+  cncnet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cncnet-server
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: "MyTunnelServer"
+      PORT1: 50001
+      PORT2: 50000
+    ports:
+      - "50000:50000/tcp"
+      - "50000:50000/udp"
+      - "50001:50001/tcp"
+      - "50001:50001/udp"
+      - "8054:8054/udp"
+      - "3478:3478/udp"
+    volumes:
+      - cncnet-logs:/logs
+
+volumes:
+  cncnet-logs:
