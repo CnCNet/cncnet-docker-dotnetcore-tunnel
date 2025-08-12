@@ -16,9 +16,7 @@ Replace `my-tunnel-server` with a name that helps you identify your container:
 docker build -t my-tunnel-server .
 ```
 
-3
-
-Run your new container with the below:
+### 3. Run your new container with the below:
 
 ```sh
 docker run -d --name my-tunnel-server \
@@ -77,7 +75,7 @@ CMD ./cncnet-server --name "CnCNet UK | cncnet.org" --2 --3 --m 200 --p 50001 --
 For example to change the servername and the official password needed to recognise your server as an official tunnel
 
 
-# Using Docker Compose
+### 3a. Using Docker Compose (Optional)
 For easier management, a docker-compose.yml is now included, you can simply update the SERVER_NAME variable and run docker compose up -d to get going alongside the Dockerfile(dotnet8 or 9) included in the same directory. 
 
 ```yml
