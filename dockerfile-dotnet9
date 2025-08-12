@@ -3,7 +3,7 @@ FROM ubuntu:latest
 
 # Install Common Software Properties
 RUN apt-get update && \
-        apt-get install -y software-properties-common
+    apt-get install -y software-properties-common
 
 # Add extra repository for backports
 RUN add-apt-repository ppa:dotnet/backports -y
@@ -13,35 +13,46 @@ RUN apt-get update && \
     apt-get install -y wget tar unzip dotnet-sdk-9.0 aspnetcore-runtime-9.0 dotnet-runtime-9.0 libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# Create a non-root user and group
+RUN groupadd -r cncnet && \
+    useradd -r -g cncnet -d /app -s /sbin/nologin cncnet
+
 # Set the working directory
 WORKDIR /app
 
-# Set the version and base URL
-ARG VERSION=v4.0.27
-ARG BASE_URL=https://github.com/Rans4ckeR/cncnet-server/releases/download/${VERSION}/
+# Set repo details and fallback version
+ARG OWNER=Rans4ckeR
+ARG REPO=cncnet-server
+ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
+ARG DEFAULT_VERSION=v4.0.27
 
-# Detect the architecture
-RUN ARCH=$(uname -m) && \
+# Detect architecture, get latest release, download and extract
+RUN VERSION=$(wget -q --server-response --max-redirect=0 https://github.com/${OWNER}/${REPO}/releases/latest 2>&1 \
+        | awk '/^  Location: /{gsub(/.*\//,""); print $0}') && \
+    VERSION=${VERSION:-$DEFAULT_VERSION} && \
+    echo "Using version $VERSION" && \
+    ARCH=$(uname -m) && \
     case "$ARCH" in \
-        x86_64) \
-            FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-x64.zip ;; \
-        aarch64) \
-            FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-arm64.zip ;; \
-        *) \
-            echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+        x86_64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-x64.zip ;; \
+        aarch64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-arm64.zip ;; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
     esac && \
-    wget ${BASE_URL}${FILE} -O /tmp/cncnet-server.zip && \
+    wget ${BASE_URL}/${VERSION}/${FILE} -O /tmp/cncnet-server.zip && \
     unzip /tmp/cncnet-server.zip -d /app && \
     rm /tmp/cncnet-server.zip
 
-# Change permissions to make cncnet-server executable
-RUN chmod +x /app/cncnet-server
+# Set permissions so cncnet owns everything
+RUN chmod +x /app/cncnet-server && \
+    mkdir -p /logs && \
+    chown -R cncnet:cncnet /app /logs
 
-# Ensure the /logs directory exists
-RUN mkdir -p /logs
+# Switch to cncnet user
+USER cncnet
 
 # Expose the required ports
 EXPOSE 50000/tcp 50000/udp 50001/tcp 50001/udp 8054/udp 3478/udp
 
-# Start the tunnel server when the container launches
-CMD /app/cncnet-server --name "My CnCNet tunnel" --2 --3 --m 200 --p 50001 --p2 50000 > /logs/cncnet-server.log 2>&1 && tail -f /logs/cncnet-server.log
+# Default environment variables
+ENV SERVER_NAME="My CnCNet tunnel"
+ENV PORT1=50001
+ENV PORT2=50000
