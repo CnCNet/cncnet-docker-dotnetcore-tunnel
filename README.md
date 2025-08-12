@@ -78,7 +78,7 @@ For example to change the servername and the official password needed to recogni
 
 
 # Using Docker Compose
-For easier management, a docker-compose.yml is now included, you can simply update the SERVER_NAME variable and run docker compose up -d to get going. 
+For easier management, a docker-compose.yml is now included, you can simply update the SERVER_NAME variable and run docker compose up -d to get going alongside the Dockerfile(dotnet8 or 9) included in the same directory. 
 
 ```yml
 services:
