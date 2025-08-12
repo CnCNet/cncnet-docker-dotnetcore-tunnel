@@ -6,7 +6,7 @@ services:
     container_name: cncnet-server
     restart: unless-stopped
     environment:
-      SERVER_NAME: "MyTunnelServer"
+      SERVER_NAME: "HottwireTest"
       PORT1: 50001
       PORT2: 50000
     ports:
@@ -18,6 +18,9 @@ services:
       - "3478:3478/udp"
     volumes:
       - cncnet-logs:/logs
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
 
 volumes:
   cncnet-logs:
