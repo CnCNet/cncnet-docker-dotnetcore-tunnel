@@ -6,7 +6,7 @@ services:
     container_name: cncnet-server
     restart: unless-stopped
     environment:
-      SERVER_NAME: "MyTunnelTest"
+      SERVER_NAME: "MyTunnel"
       PORT1: 50001
       PORT2: 50000
     ports:
