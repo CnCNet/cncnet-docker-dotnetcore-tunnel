@@ -10,8 +10,11 @@ RUN add-apt-repository ppa:dotnet/backports -y
 
 # Update and install necessary packages
 RUN apt-get update && \
-    apt-get install -y wget tar unzip dotnet-sdk-9.0 aspnetcore-runtime-9.0 dotnet-runtime-9.0 libssl-dev && \
+    apt-get install -y \
+        dotnet-sdk-9.0 aspnetcore-runtime-9.0 dotnet-runtime-9.0 \
+        wget unzip libssl-dev && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Create a non-root user and group
 RUN groupadd -r cncnet && \
@@ -27,19 +30,23 @@ ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
 ARG DEFAULT_VERSION=v4.0.27
 
 # Detect architecture, get latest release, download and extract
-RUN VERSION=$(wget -q --server-response --max-redirect=0 https://github.com/${OWNER}/${REPO}/releases/latest 2>&1 \
-        | awk '/^  Location: /{gsub(/.*\//,""); print $0}') && \
-    VERSION=${VERSION:-$DEFAULT_VERSION} && \
+RUN VERSION=$(wget -qO- https://api.github.com/repos/${OWNER}/${REPO}/releases/latest \
+        | grep '"tag_name"' | cut -d '"' -f4) && \
     echo "Using version $VERSION" && \
     ARCH=$(uname -m) && \
+    if echo "$VERSION" | grep -qE '^v4\.0\.3[3-9]|^v4\.1|^v5'; then \
+        FRAMEWORK=net10.0; \
+    else \
+        FRAMEWORK=net9.0; \
+    fi && \
     case "$ARCH" in \
-        x86_64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-x64.zip ;; \
-        aarch64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-arm64.zip ;; \
-        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+        x86_64) FILE=cncnet-server-${VERSION}-${FRAMEWORK}-V2+V3-linux-x64.zip ;; \
+        aarch64) FILE=cncnet-server-${VERSION}-${FRAMEWORK}-V2+V3-linux-arm64.zip ;; \
+        *) exit 1 ;; \
     esac && \
     wget ${BASE_URL}/${VERSION}/${FILE} -O /tmp/cncnet-server.zip && \
-    unzip /tmp/cncnet-server.zip -d /app && \
-    rm /tmp/cncnet-server.zip
+    unzip /tmp/cncnet-server.zip -d /app
+
 
 # Set permissions so cncnet owns everything
 RUN chmod +x /app/cncnet-server && \
@@ -59,3 +66,4 @@ ENV PORT2=50000
 
 # Run the tunnel and tee logs
 CMD ["sh", "-c", "/app/cncnet-server --name \"${SERVER_NAME}\" --2 --3 --m 200 --p ${PORT1} --p2 ${PORT2} 2>&1 | tee /logs/cncnet-server.log"]
+
