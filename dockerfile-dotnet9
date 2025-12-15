@@ -27,7 +27,7 @@ ARG OWNER=Rans4ckeR
 ARG REPO=cncnet-server
 ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
 
-# 🔒 Last known .NET 9 compatible release
+# Last known .NET 9 compatible release
 ARG VERSION=v4.0.27
 
 # Download and extract net9 build only
