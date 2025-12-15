@@ -28,19 +28,20 @@ ARG REPO=cncnet-server
 ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
 
 # Last known .NET 9 compatible release
-ARG VERSION=v4.0.27
+ARG VERSION=v4.0.26
 
-# Download and extract net9 build only
-RUN echo "Using pinned .NET 9 version ${VERSION}" && \
-    ARCH=$(uname -m) && \
-    case "$ARCH" in \
-        x86_64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-x64.zip ;; \
-        aarch64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-arm64.zip ;; \
-        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
-    esac && \
-    wget ${BASE_URL}/${VERSION}/${FILE} -O /tmp/cncnet-server.zip && \
-    unzip /tmp/cncnet-server.zip -d /app && \
-    rm /tmp/cncnet-server.zip
+# Download EXACT asset by architecture
+ARG ARCH=x86_64
+RUN if [ "$ARCH" = "x86_64" ]; then \
+        URL="https://github.com/Rans4ckeR/cncnet-server/releases/download/v4.0.27/cncnet-server-v4.0.27-net9.0-V2+V3-linux-x64.zip"; \
+    else \
+        URL="https://github.com/Rans4ckeR/cncnet-server/releases/download/v4.0.27/cncnet-server-v4.0.27-net9.0-V2+V3-linux-arm64.zip"; \
+    fi && \
+    wget "$URL" -O /tmp/cncnet.zip && \
+    unzip /tmp/cncnet.zip -d /app && \
+    rm /tmp/cncnet.zip && \
+    chmod +x /app/cncnet-server
+
 
 # Permissions and logs
 RUN chmod +x /app/cncnet-server && \
