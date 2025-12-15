@@ -1,62 +1,56 @@
-# Start with the Ubuntu base image
-FROM ubuntu:latest
+# Ubuntu base image
+FROM ubuntu:24.04
 
-# Install Common Software Properties
+# Avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install prerequisites and .NET 9 from dotnet backports
 RUN apt-get update && \
-    apt-get install -y software-properties-common
-
-# Add extra repository for backports
-RUN add-apt-repository ppa:dotnet/backports -y
-
-# Update and install necessary packages
-RUN apt-get update && \
+    apt-get install -y software-properties-common wget unzip libssl-dev ca-certificates && \
+    add-apt-repository ppa:dotnet/backports -y && \
+    apt-get update && \
     apt-get install -y \
-        dotnet-sdk-9.0 aspnetcore-runtime-9.0 dotnet-runtime-9.0 \
-        wget unzip libssl-dev && \
+        dotnet-sdk-9.0 \
+        aspnetcore-runtime-9.0 \
+        dotnet-runtime-9.0 && \
     rm -rf /var/lib/apt/lists/*
 
-
-# Create a non-root user and group
+# Create a non-root user
 RUN groupadd -r cncnet && \
     useradd -r -g cncnet -d /app -s /sbin/nologin cncnet
 
-# Set the working directory
+# Working directory
 WORKDIR /app
 
-# Set repo details and fallback version
+# Repo details
 ARG OWNER=Rans4ckeR
 ARG REPO=cncnet-server
 ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
-ARG DEFAULT_VERSION=v4.0.27
 
-# Detect architecture, get latest release, download and extract
-RUN VERSION=$(wget -qO- https://api.github.com/repos/${OWNER}/${REPO}/releases/latest \
-        | grep '"tag_name"' | cut -d '"' -f4) && \
-    echo "Using version $VERSION" && \
+# 🔒 Last known .NET 9 compatible release
+ARG VERSION=v4.0.26
+
+# Download and extract net9 build only
+RUN echo "Using pinned .NET 9 version ${VERSION}" && \
     ARCH=$(uname -m) && \
-    if echo "$VERSION" | grep -qE '^v4\.0\.3[3-9]|^v4\.1|^v5'; then \
-        FRAMEWORK=net10.0; \
-    else \
-        FRAMEWORK=net9.0; \
-    fi && \
     case "$ARCH" in \
-        x86_64) FILE=cncnet-server-${VERSION}-${FRAMEWORK}-V2+V3-linux-x64.zip ;; \
-        aarch64) FILE=cncnet-server-${VERSION}-${FRAMEWORK}-V2+V3-linux-arm64.zip ;; \
-        *) exit 1 ;; \
+        x86_64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-x64.zip ;; \
+        aarch64) FILE=cncnet-server-${VERSION}-net9.0-V2+V3-linux-arm64.zip ;; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
     esac && \
     wget ${BASE_URL}/${VERSION}/${FILE} -O /tmp/cncnet-server.zip && \
-    unzip /tmp/cncnet-server.zip -d /app
+    unzip /tmp/cncnet-server.zip -d /app && \
+    rm /tmp/cncnet-server.zip
 
-
-# Set permissions so cncnet owns everything
+# Permissions and logs
 RUN chmod +x /app/cncnet-server && \
     mkdir -p /logs && \
     chown -R cncnet:cncnet /app /logs
 
-# Switch to cncnet user
+# Drop privileges
 USER cncnet
 
-# Expose the required ports
+# Expose ports
 EXPOSE 50000/tcp 50000/udp 50001/tcp 50001/udp 8054/udp 3478/udp
 
 # Default environment variables
@@ -66,4 +60,3 @@ ENV PORT2=50000
 
 # Run the tunnel and tee logs
 CMD ["sh", "-c", "/app/cncnet-server --name \"${SERVER_NAME}\" --2 --3 --m 200 --p ${PORT1} --p2 ${PORT2} 2>&1 | tee /logs/cncnet-server.log"]
-
