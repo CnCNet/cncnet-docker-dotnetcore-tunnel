@@ -38,34 +38,41 @@ docker run -d --name my-tunnel-server \
 You can edit your dockerfile to contain extra tunnel options using the options below:
 ```
 Options:
-  --n, --name <name> (REQUIRED)                            Name of the server
-  --p, --tunnelport <tunnelport>                           Port used for the V3 tunnel server [default: 50001]
-  --p2, --tunnelv2port <tunnelv2port>                      Port used for the V2 tunnel server [default: 50000]
-  --m, --maxclients <maxclients>                           Maximum clients allowed on the tunnel server [default: 200]
-  --nm, --nomasterannounce                                 Don't register to master [default: False]
-  --masp, --masterpassword <masterpassword>                Master password []
-  --maintenancepassword, --maip <maintenancepassword>      Maintenance password []
-  --masterserverurl, --mu <masterserverurl>                Master server URL [default:
-                                                           https://cncnet.org/master-announce]
-  --i, --iplimit <iplimit>                                 Maximum clients allowed per IP address [default: 8]
-  --nopeertopeer, --np                                     Disable STUN NAT traversal server (UDP 8054 & 3478)
-                                                           [default: False]
-  --3, --tunnelv3enabled                                   Start a V3 tunnel server [default: True]
-  --2, --tunnelv2enabled                                   Start a V2 tunnel server [default: True]
-  --sel, --serverloglevel                                  CnCNet server messages log level [default: Information]
-  <Critical|Debug|Error|Information|None|Trace|Warning>
-  --syl, --systemloglevel                                  Low level system messages log level [default: Warning]
-  <Critical|Debug|Error|Information|None|Trace|Warning>
-  --6, --announceipv6                                      Announce IPv6 address to master server [default: True]
-  --4, --announceipv4                                      Announce IPv4 address to master server [default: True]
-  --h, --tunnelv2https                                     Use https Tunnel V2 web server [default: False]
-  --maxpacketsize, --mps <maxpacketsize>                   Maximum accepted packet size [default: 2048]
-  --maxpingsglobal, --mpg <maxpingsglobal>                 Maximum accepted ping requests globally [default: 1024]
-  --maxpingsperip, --mpi <maxpingsperip>                   Maximum accepted ping requests per IP [default: 20]
-  --ai, --masterannounceinterval <masterannounceinterval>  Master server announce interval in seconds [default: 60]
-  --c, --clienttimeout <clienttimeout>                     Client timeout in seconds [default: 60]
-  --version                                                Show version information
-  -?, -h, --help                                           Show help and usage information
+  -?, -h, --help                                        Show help and usage information
+  --version                                             Show version information
+  -n, --name (REQUIRED)                                 Name of the server
+  -p, --tunnel-port                                     Port used for the V3 tunnel server [default: 50001]
+  -p2, --tunnel-v2-port                                 Port used for the V2 tunnel server [default: 50000]
+  -m, --max-clients                                     Maximum clients allowed on the tunnel server
+                                                        [default: 200]
+  -nm, --no-master-announce                             Don't register to master [default: False]
+  -masp, --master-password                              Master password []
+  -maip, --maintenance-password                         Maintenance password []
+  -mu, --master-server-url                              Master server URL [default:
+                                                        https://cncnet.org/api/v1/master-announce]
+  -i, --ip-limit                                        Maximum clients allowed per IP address [default: 8]
+  -np, --no-peer-to-peer                                Disable STUN NAT traversal server (UDP 8054 & 3478)
+                                                        [default: False]
+  -3, --tunnel-v3-enabled                               Start a V3 tunnel server [default: True]
+  -2, --tunnel-v2-enabled                               Start a V2 tunnel server [default: True]
+  -sel, --server-log-level                              CnCNet server messages log level [default: Warning]
+  <Critical|Debug|Error|Information|None|Trace|Warning
+  >
+  -syl, --system-log-level                              Low level system messages log level [default:
+  <Critical|Debug|Error|Information|None|Trace|Warning  Warning]
+  >
+  -6, --announce-ipv6                                   Announce IPv6 address to master server [default:
+                                                        True]
+  -4, --announce-ipv4                                   Announce IPv4 address to master server [default:
+                                                        True]
+  -h, --tunnel-v2-https                                 Use https Tunnel V2 web server [default: False]
+  -mps, --max-packet-size                               Maximum accepted packet size [default: 2048]
+  -mpg, --max-pings-global                              Maximum accepted ping requests globally [default:
+                                                        1024]
+  -mpi, --max-pings-per-ip                              Maximum accepted ping requests per IP [default: 20]
+  -ai, -master-announce-interval                        Master server announce interval in seconds
+                                                        [default: 60]
+  -c, --client-timeout                                  Client timeout in seconds [default: 60]
 ```
 
 So your dockerfile run command may end up looking like 
