@@ -46,6 +46,6 @@ jobs:
           context: .
           file: dockerfile-dotnet9
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/${{ env.IMAGE_NAME }}-dotnet9:latest
+          tags: ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet9:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
