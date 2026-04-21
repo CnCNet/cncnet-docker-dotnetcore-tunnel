@@ -1,13 +1,10 @@
-name: Docker Image CI - dotnet9
+name: Docker Image CI - dotnet8
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  schedule:
-    # Runs at 00:00 every Monday (0 = Sunday, 1 = Monday)
-    - cron: '0 0 * * 1'
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -47,8 +44,8 @@ jobs:
         uses: docker/build-push-action@master
         with:
           context: .
-          file: dockerfile-dotnet9
+          file: dockerfile-dotnet8
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet9:latest
+          tags: ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet8:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

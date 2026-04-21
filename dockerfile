@@ -1,59 +1,63 @@
-## Warning, this file will no longer get updates due to Rans4ckeR not supporting it. For more up to date versions please use the dotnet9 version: https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/blob/main/dockerfile-dotnet9
-
+# Ubuntu base image
 FROM ubuntu:latest
 
-# Install Common Software Properties
-RUN apt-get update && \
-    apt-get install -y software-properties-common
+# Avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Add extra repository for backports
-RUN add-apt-repository ppa:dotnet/backports -y
-
-# Update and install necessary packages
+# Install prerequisites and .NET 9 from dotnet backports
 RUN apt-get update && \
-    apt-get install -y wget tar unzip dotnet-sdk-8.0 aspnetcore-runtime-8.0 dotnet-runtime-8.0 libssl-dev && \
+    apt-get install -y software-properties-common wget unzip libssl-dev ca-certificates && \
+    add-apt-repository ppa:dotnet/backports -y && \
+    apt-get update && \
+    apt-get install -y \
+        dotnet-sdk-10.0 \
+        aspnetcore-runtime-10.0 \
+        dotnet-runtime-10.0 && \
     rm -rf /var/lib/apt/lists/*
 
-# Add cncnet user and group, no password, home directory
-RUN groupadd -r cncnet && useradd -r -g cncnet -m cncnet
+# Create a non-root user
+RUN groupadd -r cncnet && \
+    useradd -r -g cncnet -d /app -s /sbin/nologin cncnet
 
-# Set working directory
+# Working directory
 WORKDIR /app
 
-# Set version and base URL as build args
-ARG VERSION=v4.0.19
-ARG BASE_URL=https://github.com/Rans4ckeR/cncnet-server/releases/download/${VERSION}/
+# Repo details
+ARG OWNER=Rans4ckeR
+ARG REPO=cncnet-server
+ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
+
+# Last known .NET 10 compatible release
+ARG VERSION=v4.0.33
+
+# Download EXACT asset by architecture
+ARG ARCH=x86_64
+RUN if [ "$ARCH" = "x86_64" ]; then \
+        URL="https://github.com/Rans4ckeR/cncnet-server/releases/download/v4.0.33/cncnet-server-v4.0.33-net10.0-V2+V3-linux-x64.zip"; \
+    else \
+        URL="https://github.com/Rans4ckeR/cncnet-server/releases/download/v4.0.33/cncnet-server-v4.0.33-net10.0-V2+V3-linux-arm64.zip"; \
+    fi && \
+    wget "$URL" -O /tmp/cncnet.zip && \
+    unzip /tmp/cncnet.zip -d /app && \
+    rm /tmp/cncnet.zip && \
+    chmod +x /app/cncnet-server
+
+
+# Permissions and logs
+RUN chmod +x /app/cncnet-server && \
+    mkdir -p /logs && \
+    chown -R cncnet:cncnet /app /logs
+
+# Drop privileges
+USER cncnet
+
+# Expose ports
+EXPOSE 50000/tcp 50000/udp 50001/tcp 50001/udp 8054/udp 3478/udp
 
 # Default environment variables
 ENV SERVER_NAME="My CnCNet tunnel"
 ENV PORT1=50001
 ENV PORT2=50000
 
-# Download and unzip the correct architecture build
-RUN ARCH=$(uname -m) && \
-    case "$ARCH" in \
-        x86_64) \
-            FILE=cncnet-server-${VERSION}-net8.0-V2+V3-linux-x64.zip ;; \
-        aarch64) \
-            FILE=cncnet-server-${VERSION}-net8.0-V2+V3-linux-arm64.zip ;; \
-        *) \
-            echo "Unsupported architecture: $ARCH" && exit 1 ;; \
-    esac && \
-    wget ${BASE_URL}${FILE} -O /tmp/cncnet-server.zip && \
-    unzip /tmp/cncnet-server.zip -d /app && \
-    rm /tmp/cncnet-server.zip
-
-# Change permissions to make cncnet-server executable
-RUN chmod +x /app/cncnet-server
-
-# Ensure /logs directory exists and set ownership
-RUN mkdir -p /logs && chown cncnet:cncnet /logs /app
-
-# Switch to non-root user
-USER cncnet
-
-# Expose the required ports
-EXPOSE 50000/tcp 50000/udp 50001/tcp 50001/udp 8054/udp 3478/udp
-
-# Start the tunnel server with env variables for name and ports, log to both file and stdout
+# Run the tunnel and tee logs
 CMD ["sh", "-c", "/app/cncnet-server --name \"${SERVER_NAME}\" --2 --3 --m 200 --p ${PORT1} --p2 ${PORT2} 2>&1 | tee /logs/cncnet-server.log"]
