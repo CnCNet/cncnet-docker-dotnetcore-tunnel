@@ -1,4 +1,4 @@
-name: Docker Image CI - dotnet9
+name: Docker Image CI - dotne10
 
 on:
   push:
