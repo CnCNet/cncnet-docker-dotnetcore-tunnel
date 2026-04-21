@@ -1,6 +1,6 @@
 # CnCNET Docker Tunnel Server based on .NET Core
 
-This repository contains Dockerfiles to create a CnCNet tunnel server in Docker using .NET 8 or .NET 9 Core technology.
+This repository contains Dockerfiles to create a CnCNet tunnel server in Docker using .NET 8/.NET 9/.NET 10 Core technology.
 
 ---
 
