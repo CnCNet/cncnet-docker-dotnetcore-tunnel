@@ -4,7 +4,38 @@ This repository contains Dockerfiles to create a CnCNet tunnel server in Docker 
 
 ---
 
-## Getting Started
+## Quick Start (Prebuilt Image)
+
+Each .NET version is automatically built and published to the GitHub Container Registry, so you can pull and run it directly — no need to clone this repo or build anything:
+
+| .NET version | Image |
+| --- | --- |
+| .NET 10 (recommended) | `ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet10:latest` |
+| .NET 9 | `ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet9:latest` |
+| .NET 8 | `ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet8:latest` |
+
+```sh
+docker run -d --name my-tunnel-server \
+    -p 50000:50000/tcp \
+    -p 50000:50000/udp \
+    -p 50001:50001/tcp \
+    -p 50001:50001/udp \
+    -p 8054:8054/udp \
+    -p 3478:3478/udp \
+    --cap-add=NET_RAW --cap-add=NET_ADMIN \
+    --restart unless-stopped \
+    -v /path/to/host/logs:/logs \
+    -e SERVER_NAME="My Custom Tunnel Name" \
+    -e PORT1=50001 \
+    -e PORT2=50000 \
+    ghcr.io/cncnet/cncnet-docker-dotnetcore-tunnel-dotnet10:latest
+```
+
+Prefer to build the image yourself (e.g. to customise the tunnel options)? Follow the steps below instead.
+
+---
+
+## Getting Started (Build It Yourself)
 
 ### 1. Clone the Dockerfile you want from this repo to your server.
 
