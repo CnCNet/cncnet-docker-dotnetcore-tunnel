@@ -1,6 +1,10 @@
-# CnCNET Docker Tunnel Server based on .NET Core
+# CnCNet Docker Tunnel Server based on .NET Core
 
 This repository contains Dockerfiles to create a CnCNet tunnel server in Docker using .NET 8/.NET 9/.NET 10 Core technology.
+
+[![Docker Image CI - dotnet10](https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/actions/workflows/publish-docker-image-dotnet10.yml/badge.svg)](https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/actions/workflows/publish-docker-image-dotnet10.yml)
+[![Docker Image CI - dotnet9](https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/actions/workflows/publish-docker-image-dotnet9.yml/badge.svg)](https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/actions/workflows/publish-docker-image-dotnet9.yml)
+[![Docker Image CI - dotnet8](https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/actions/workflows/publish-docker-image-dotnet8.yml/badge.svg)](https://github.com/CnCNet/cncnet-docker-dotnetcore-tunnel/actions/workflows/publish-docker-image-dotnet8.yml)
 
 ---
 
