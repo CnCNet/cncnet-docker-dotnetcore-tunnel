@@ -28,7 +28,7 @@ ARG REPO=cncnet-server
 ARG BASE_URL=https://github.com/${OWNER}/${REPO}/releases/download
 
 # Last known .NET 10 compatible release
-ARG VERSION=v4.0.33
+ARG VERSION=v4.0.36
 
 # Download EXACT asset by architecture
 ARG ARCH=x86_64
