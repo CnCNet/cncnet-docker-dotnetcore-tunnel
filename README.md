@@ -6,7 +6,9 @@ This repository contains Dockerfiles to create a CnCNet tunnel server in Docker 
 
 ## Getting Started
 
-### 1. Clone the Dockerfile you want (net8 or net9) from this repo to your server.
+### 1. Clone the Dockerfile you want from this repo to your server.
+
+The default `Dockerfile` targets .NET 10 (recommended). Older `dockerfile-dotnet8` and `dockerfile-dotnet9` variants are also provided.
 
 ### 2. Build the Docker image
 
